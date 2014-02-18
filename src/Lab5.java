@@ -36,17 +36,18 @@ public class Lab5 {
 			odo.start();
 			lcd.start();
 		} else {
-			//blockDetector =  new BlockDetection(usPoller, cs, driver, true);
-			USLocalizer usLocalizer = new USLocalizer(odo, driver, new UltrasonicSensor(SensorPort.S2), USLocalizer.LocalizationType.FALLING_EDGE);
-			usLocalizer.doLocalization();
-			
-			odo.start();
-			//OdometryDisplay lcd = new OdometryDisplay(odo, blockDetector, usPoller);
-			//lcd.start();
-			//blockDetector.start();
-			
-			//driver.travel(xDest, yDest);
+			blockDetector =  new BlockDetection(usPoller, cs, driver, true);
 			/*
+			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
+			usLocalizer.doLocalization();
+			*/
+			odo.start();
+			OdometryDisplay lcd = new OdometryDisplay(odo, blockDetector, usPoller);
+			lcd.start();
+			blockDetector.start();
+			
+			driver.travel(xDest, yDest);
+			
 			while(true){
 				if(blockDetector.seesObject() && !blockDetector.seesBlock()){
 					avoidBlock();
@@ -54,7 +55,7 @@ public class Lab5 {
 						driver.travel(Lab5.xDest, Lab5.yDest);
 					}
 				}
-			}*/
+			}
 		}
 
 		// perform the ultrasonic localization

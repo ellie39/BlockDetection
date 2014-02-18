@@ -10,7 +10,7 @@ import lejos.util.Delay;
  *beeps if it sees a particular color
  */
 public class BlockDetection extends Thread{
-	private final int MIN_DISTANCE = 18;
+	private final int MIN_DISTANCE = 25;
 	private final int BLOCK_BLUE = 12;
 	//private final int BLOCK_GREEN = 5;
 	private UltrasonicPoller usPoller;

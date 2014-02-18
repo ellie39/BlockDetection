@@ -20,17 +20,14 @@ public class USLocalizer {
 	public static String doing = "";
 	private Odometer odo;
 	private Driver robot;
-	private UltrasonicSensor us;
+	private UltrasonicPoller poller;
 	private LocalizationType locType;
 	
-	public USLocalizer(Odometer odo, Driver driver, UltrasonicSensor us, LocalizationType locType) {
+	public USLocalizer(Odometer odo, Driver driver, UltrasonicPoller usPoller, LocalizationType locType) {
 		this.odo = odo;
 		this.robot = driver;
-		this.us = us;
+		this.poller = usPoller;
 		this.locType = locType;
-		
-		// switch off the ultrasonic sensor
-		us.off();
 	}
 	
 	public void doLocalization() {
@@ -39,27 +36,25 @@ public class USLocalizer {
 			// rotate the robot until it sees no wall
 			rotateFromWall(true);
 			//to avoid seeing one wall twice
-
+			Sound.beep();
 			robot.turnTo(25);
-
+			Sound.beep();
 			// keep rotating until the robot sees a wall, then latch the angle
 			rotateToWall(true);
 			angleA = odo.getTheta();
-
+			Sound.beep();
 			robot.turnTo(-25);
-
+			Sound.beep();
 			// switch direction and wait until it sees no wall
 			rotateFromWall(false);
 			// keep rotating until the robot sees a wall, then latch the angle
 			rotateToWall(false);
 			angleB = odo.getTheta();
-			Sound.buzz();
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			errorAngle = getAngle(angleA, angleB);
-			// update the odometer position (example to follow:)
 			robot.turnTo(errorAngle);
-			Sound.beep();
+			// update the odometer position (example to follow:)
 			odo.setPosition(new double [] {0.0, 0.0, 0.0}, new boolean [] {true, true, true});
 		} else {
 			/*
@@ -77,15 +72,13 @@ public class USLocalizer {
 			Sound.beep();
 			robot.turnTo(15);
 			Sound.beep();
-			
+			//goes in the opposite direction towards a wall
 			rotateToWall(false);
 			
 			//rotateToWall(false);
 			
 			angleB = odo.getTheta();
-			//
-			// FILL THIS IN
-			//
+
 			errorAngle = getAngle(angleA, angleB);
 			robot.turnTo(errorAngle + 45);
 			odo.setPosition(new double [] {0.0, 0.0, 45}, new boolean [] {true, true, true});
@@ -132,14 +125,8 @@ public class USLocalizer {
 		}
 	private int getFilteredData() {
 		int dist;
-		
-		// do a ping
-		us.ping();
-		// wait for the ping to complete
 		try { Thread.sleep(50); } catch (InterruptedException e) {}
-		
-		// there will be a delay here
-		dist = us.getDistance();
+		dist = (int) poller.getDistance();
 		if(dist > 50)
 			dist = 50;
 		return dist;
