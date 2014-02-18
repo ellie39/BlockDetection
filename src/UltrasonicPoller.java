@@ -41,7 +41,7 @@ public class UltrasonicPoller implements TimerListener {
 	 */
 	@Override
 	public void timedOut() {
-		this.distance = us.getDistance();		
+		synchronized(lock){this.distance = us.getDistance();}
 	}
 	/**
 	 * Stops timer

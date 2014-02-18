@@ -6,18 +6,32 @@
  */
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
+import lejos.nxt.Sound;
+import lejos.util.Delay;
 
 
 public class Driver extends Thread  {
+	/* minimum speed the robot will travel at */
+	private final int MIN_SPEED = 150;
+	/* max speed the robot will travel at */
+	private final int MAX_SPEED = 350;
+	/*factor the error is multiplied by to calculate the speed*/
+	private final int SCALING_FACTOR = 10;
 	
 	private static final int FORWARD_SPEED = 250;
 	private static final int ROTATE_SPEED = 150;
 	private static final int LOCALIZE_SPEED = 100;
 	
+	private static int speed;
+	public static double xDest, yDest;
+	
 	NXTRegulatedMotor leftMotor = Motor.A;
 	NXTRegulatedMotor rightMotor = Motor.B;
+	NXTRegulatedMotor armMotor = Motor.C;
+	
 	private static double WHEEL_BASE = 15.5;
 	private static double WHEEL_RADIUS = 2.16;
+	
 	public double thetar, xr, yr;
 	private boolean navigating;
 	private Odometer odo;
@@ -35,6 +49,8 @@ public class Driver extends Thread  {
  * @param Y Coordinate of destination
  */
 	public void travel (double x, double y){
+			xDest = x;
+			yDest = y;
 		//gets position. Synchronized to avoid collision
 			synchronized (odo.lock) {
 				thetar = odo.getTheta() * 180 / Math.PI;
@@ -56,25 +72,39 @@ public class Driver extends Thread  {
 			}
 			else turnTo(theta);
 			//updates values to display
-			
 			goForward(distance);
 	}
 	
 	public void goForward(double distance){
 		
-		// drive forward 
-		leftMotor.setSpeed(FORWARD_SPEED);
-		rightMotor.setSpeed(FORWARD_SPEED);
+		// drive forward
+		speed = FORWARD_SPEED;
+		leftMotor.setSpeed(speed);
+		rightMotor.setSpeed(speed);
 		
 		//for isNavigatingMethod
 		navigating = true;
 		
 		leftMotor.rotate(convertDistance(WHEEL_RADIUS, distance), true);
-		rightMotor.rotate(convertDistance(WHEEL_RADIUS, distance), false);
+		rightMotor.rotate(convertDistance(WHEEL_RADIUS, distance), true);
 		
 		navigating = false;
 	}
-	
+	public void goForward(double distance, boolean returnImmediately){
+		
+		// drive forward
+		speed = FORWARD_SPEED;
+		leftMotor.setSpeed(speed);
+		rightMotor.setSpeed(speed);
+		
+		//for isNavigatingMethod
+		navigating = true;
+		
+		leftMotor.rotate(convertDistance(WHEEL_RADIUS, distance), true);
+		rightMotor.rotate(convertDistance(WHEEL_RADIUS, distance), returnImmediately);
+		
+		navigating = false;
+	}
 	public void turnTo (double theta){
 	
 		// turn degrees clockwise
@@ -94,15 +124,26 @@ public class Driver extends Thread  {
 		if (forward){
 			leftMotor.forward();
 			rightMotor.backward();
-		} else {
+		} else { 
 			leftMotor.backward();
 			rightMotor.forward();
 		}
 	}
-	
+	public void grab(){
+		armMotor.forward();
+		armMotor.setSpeed(150);
+		armMotor.rotate(-75, true);
+		Delay.msDelay(250);
+		armMotor.stop();
+	}
 	public void stop(){
+		speed = leftMotor.getSpeed();
 		leftMotor.setSpeed(0);
 		rightMotor.setSpeed(0);
+	}
+	public void resume(){
+		leftMotor.setSpeed(speed);
+		rightMotor.setSpeed(speed);
 	}
 /**
  * Returns true if the robot is navigating

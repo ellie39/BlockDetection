@@ -13,13 +13,16 @@ public class OdometryDisplay extends Thread {
 	private static final long DISPLAY_PERIOD = 250;
 	private Odometer odometer;
 	BlockDetection detector;
+	UltrasonicPoller usPoller;
+	
 	public static double thetaD;
 	public static double thetaR;
 	public static double theta;
 	// constructor
-	public OdometryDisplay(Odometer odometer, BlockDetection detector) {
+	public OdometryDisplay(Odometer odometer, BlockDetection detector, UltrasonicPoller usPoller) {
 		this.odometer = odometer;
 		this.detector = detector;
+		this.usPoller = usPoller;
 	}
 
 	// run method (required for Thread)
@@ -36,7 +39,7 @@ public class OdometryDisplay extends Thread {
 			LCD.drawString("X:              ", 0, 0);
 			LCD.drawString("Y:              ", 0, 1);
 			LCD.drawString("T:              ", 0, 2);
-			//LCD.drawString("Blue:           ", 0, 3);
+			
 			// get the odometry information
 			odometer.getPosition(position);
 
@@ -44,11 +47,16 @@ public class OdometryDisplay extends Thread {
 			for (int i = 0; i < 3; i++) {
 				LCD.drawString(formattedDoubleToString(position[i], 2), 3, i);
 			}
-			LCD.drawString("Blue: " + detector.getBlue(), 0, 3);
-			//String object = detector.seesObject() ? "Sees Object" : "No Object";
-			//String block = detector.seesBlock() ? "Sees Block" : "No Block";
+			
 			LCD.drawString(detector.seesObject() ? "Sees Object" : "No Object", 0, 4);
 			LCD.drawString(detector.seesBlock() ? "Sees Block" : "No Block", 0, 5);
+			/*
+			Color color = detector.getColor();
+			LCD.drawString("Blue: " + color.getBlue() + "     ", 0, 3);
+			LCD.drawString("Green: " + color.getGreen() + "     ", 0, 4);
+			LCD.drawString("Red: " + color.getRed() + "     ", 0, 5);
+			*/
+			LCD.drawString("Distance: " + usPoller.getDistance() + "     ", 0, 7);
 			// throttle the OdometryDisplay
 			displayEnd = System.currentTimeMillis();
 			if (displayEnd - displayStart < DISPLAY_PERIOD) {
