@@ -16,7 +16,6 @@ public class Lab5 {
 		blockDetector =  new BlockDetection(usPoller, cs, driver);
 		OdometryDisplay lcd = new OdometryDisplay(odo, blockDetector, usPoller);
 		odo.start();
-		blockDetector.start();
 
 		int buttonChoice;
 		do {
@@ -36,17 +35,24 @@ public class Lab5 {
 		lcd.start();
 		if(buttonChoice == Button.ID_RIGHT){
 			
-			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
-			usLocalizer.doLocalization();
+/*			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
+			usLocalizer.doLocalization();*/
 			
+			//Travel doesn't block anymore, so Immiediate Return occurs
 			driver.travel(xDest, yDest);
-			
+			//allows blocks to be detected
 			while(true){
+				//avoids if object
 				if(blockDetector.seesObject() && !blockDetector.seesBlock()){
 					avoidBlock();
 					if(!blockDetector.seesObject() || blockDetector.seesBlock()){
 						driver.travel(Lab5.xDest, Lab5.yDest);
 					}
+				}
+				//buzzes if block
+				else if(blockDetector.seesBlock()){
+					Sound.buzz();
+					driver.stop();
 				}
 			}
 		}
@@ -56,12 +62,15 @@ public class Lab5 {
 	public static void avoidBlock(){
 		Sound.buzz();
 		driver.stop();
-		Sound.beep();
+		Delay.msDelay(1000);
+		driver.goBackward(10);
 		driver.turnTo(90);
-		if(!blockDetector.seesObject() || blockDetector.seesBlock()){
+		if(blockDetector.seesBlock() || !blockDetector.seesObject()){
 			driver.goForward(20, false);
 			driver.turnTo(-120);
+			if(blockDetector.seesObject()){
+				avoidBlock();
+			}
 		}
-		else avoidBlock();
 	}
 }

@@ -2,6 +2,8 @@ import lejos.nxt.ColorSensor;
 import lejos.nxt.ColorSensor.Color;
 import lejos.nxt.Sound;
 import lejos.util.Delay;
+import lejos.util.Timer;
+import lejos.util.TimerListener;
 
 /**
  * 
@@ -9,16 +11,17 @@ import lejos.util.Delay;
  *Block detection
  *beeps if it sees a particular color
  */
-public class BlockDetection extends Thread{
-	private final int MIN_DISTANCE = 25;
+public class BlockDetection implements TimerListener{
+	private final int MIN_DISTANCE = 17;
 	private final int BLOCK_BLUE = 12;
+	private static final int TIMER_PERIOD = 50;
 	//private final int BLOCK_GREEN = 5;
 	private UltrasonicPoller usPoller;
 	private ColorSensor coSensor;
 	private Color color;
 	private Driver robot;
 	private Object lock;
-	
+	private Timer timer;
 	private boolean seesBlock = false;
 	private boolean seesObject = false;
 	public BlockDetection(UltrasonicPoller usPoller, ColorSensor coSensor, Driver driver){
@@ -26,25 +29,20 @@ public class BlockDetection extends Thread{
 		this.usPoller = usPoller;
 		this.lock = new Object();
 		this.robot = driver;
+		this.timer = new Timer(TIMER_PERIOD, this);
+		
+		timer.start();
 	}
-	public void run(){
-		while(true){
-			synchronized(lock){color = coSensor.getColor();}
-			//Pauses thread
-			if(usPoller.getDistance() < MIN_DISTANCE){
-				seesObject = true;
-				detectBlock();
-				//Sound.beep();
-/*				if(!seesBlock && avoid){
-					robot.avoid();
-					robot.travel(Lab5.xDest, Lab5.yDest);
-				}*/
-			}
-			else {
-				seesObject = false;
-				seesBlock = false;
-			}
-			try {Thread.sleep(50);} catch (InterruptedException e) {e.printStackTrace();}
+	@Override
+	public void timedOut() {
+		synchronized(lock){color = coSensor.getColor();}
+		if(usPoller.getDistance() < MIN_DISTANCE){
+			seesObject = true;
+			detectBlock();
+		}
+		else {
+			seesObject = false;
+			seesBlock = false;
 		}
 	}
 	private void detectBlock(){

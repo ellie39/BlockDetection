@@ -18,7 +18,7 @@ public class Driver extends Thread  {
 	/*factor the error is multiplied by to calculate the speed*/
 	private final int SCALING_FACTOR = 10;
 	
-	private static final int FORWARD_SPEED = 250;
+	private static final int FORWARD_SPEED = 200;
 	private static final int ROTATE_SPEED = 150;
 	private static final int LOCALIZE_SPEED = 100;
 	
@@ -74,7 +74,7 @@ public class Driver extends Thread  {
 			//updates values to display
 			goForward(distance);
 	}
-	
+	//doesn't block
 	public void goForward(double distance){
 		
 		// drive forward
@@ -102,6 +102,20 @@ public class Driver extends Thread  {
 		
 		leftMotor.rotate(convertDistance(WHEEL_RADIUS, distance), true);
 		rightMotor.rotate(convertDistance(WHEEL_RADIUS, distance), returnImmediately);
+		
+		navigating = false;
+	}
+	public void goBackward(double distance){
+		// drive forward
+		speed = FORWARD_SPEED;
+		leftMotor.setSpeed(speed);
+		rightMotor.setSpeed(speed);
+		Sound.beep();
+		//for isNavigatingMethod
+		navigating = true;
+		
+		leftMotor.rotate(-convertDistance(WHEEL_RADIUS, distance), true);
+		rightMotor.rotate(-convertDistance(WHEEL_RADIUS, distance), false);
 		
 		navigating = false;
 	}
