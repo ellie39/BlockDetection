@@ -13,7 +13,11 @@ public class Lab5 {
 		//cs.setFloodlight(lejos.robotics.Color.RED);
 		Odometer odo = new Odometer();
 		driver = new Driver(odo);
-		
+		blockDetector =  new BlockDetection(usPoller, cs, driver);
+		OdometryDisplay lcd = new OdometryDisplay(odo, blockDetector, usPoller);
+		odo.start();
+		blockDetector.start();
+
 		int buttonChoice;
 		do {
 			// clear the display
@@ -29,22 +33,11 @@ public class Lab5 {
 			buttonChoice = Button.waitForAnyPress();
 		} while (buttonChoice != Button.ID_LEFT
 				&& buttonChoice != Button.ID_RIGHT);
-		if(buttonChoice == Button.ID_LEFT){
-			blockDetector =  new BlockDetection(usPoller, cs, driver, false);
-			blockDetector.start();
-			OdometryDisplay lcd = new OdometryDisplay(odo, blockDetector, usPoller);
-			odo.start();
-			lcd.start();
-		} else {
-			blockDetector =  new BlockDetection(usPoller, cs, driver, true);
-			/*
+		lcd.start();
+		if(buttonChoice == Button.ID_RIGHT){
+			
 			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
 			usLocalizer.doLocalization();
-			*/
-			odo.start();
-			OdometryDisplay lcd = new OdometryDisplay(odo, blockDetector, usPoller);
-			lcd.start();
-			blockDetector.start();
 			
 			driver.travel(xDest, yDest);
 			
@@ -57,14 +50,13 @@ public class Lab5 {
 				}
 			}
 		}
-
-		// perform the ultrasonic localization
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
 	}
 	public static void avoidBlock(){
 		Sound.buzz();
 		driver.stop();
+		Sound.beep();
 		driver.turnTo(90);
 		if(!blockDetector.seesObject() || blockDetector.seesBlock()){
 			driver.goForward(20, false);

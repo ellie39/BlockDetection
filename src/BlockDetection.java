@@ -18,16 +18,14 @@ public class BlockDetection extends Thread{
 	private Color color;
 	private Driver robot;
 	private Object lock;
-	private boolean avoid;
 	
 	private boolean seesBlock = false;
 	private boolean seesObject = false;
-	public BlockDetection(UltrasonicPoller usPoller, ColorSensor coSensor, Driver driver, boolean avoid){
+	public BlockDetection(UltrasonicPoller usPoller, ColorSensor coSensor, Driver driver){
 		this.coSensor = coSensor;
 		this.usPoller = usPoller;
 		this.lock = new Object();
 		this.robot = driver;
-		this.avoid = avoid;
 	}
 	public void run(){
 		while(true){

@@ -53,7 +53,8 @@ public class USLocalizer {
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			errorAngle = getAngle(angleA, angleB);
-			robot.turnTo(errorAngle);
+			//dirty fix
+			robot.turnTo(errorAngle + 20);
 			// update the odometer position (example to follow:)
 			odo.setPosition(new double [] {0.0, 0.0, 0.0}, new boolean [] {true, true, true});
 		} else {
@@ -113,12 +114,12 @@ public class USLocalizer {
 		 
 		 if(alpha > beta)
 			{
-			  deltaTheta = 225 - (alpha + beta)/2;
+			  deltaTheta = 45 - (alpha + beta)/2;
 			  
 			}
 			else
 			{
-				deltaTheta = 45 - (alpha + beta)/2;
+				deltaTheta = 225 - (alpha + beta)/2;
 			}
 			 
 		 return deltaTheta;
