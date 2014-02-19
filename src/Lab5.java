@@ -44,15 +44,20 @@ public class Lab5 {
 			while(true){
 				//avoids if object
 				if(blockDetector.seesObject() && !blockDetector.seesBlock()){
+					Sound.beep();
+					Delay.msDelay(100);
 					avoidBlock();
 					if(!blockDetector.seesObject() || blockDetector.seesBlock()){
 						driver.travel(Lab5.xDest, Lab5.yDest);
 					}
 				}
 				//buzzes if block
-				else if(blockDetector.seesBlock()){
-					Sound.buzz();
-					driver.stop();
+				if(blockDetector.seesBlock()){
+					Sound.beep();
+					Delay.msDelay(100);
+					Sound.beep();
+					Delay.msDelay(100);
+					getBlock();
 				}
 			}
 		}
@@ -72,5 +77,8 @@ public class Lab5 {
 				avoidBlock();
 			}
 		}
+	}
+	public static void getBlock(){
+		
 	}
 }
