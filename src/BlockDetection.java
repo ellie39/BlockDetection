@@ -12,8 +12,8 @@ import lejos.util.TimerListener;
  *beeps if it sees a particular color
  */
 public class BlockDetection implements TimerListener{
-	private final int MIN_DISTANCE = 17;
-	private final int BLOCK_BLUE = 12;
+	private final int MIN_DISTANCE = 20;
+	private final int BLOCK_BLUE = 7;
 	private static final int TIMER_PERIOD = 50;
 	//private final int BLOCK_GREEN = 5;
 	private UltrasonicPoller usPoller;
