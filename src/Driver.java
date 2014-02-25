@@ -27,7 +27,7 @@ public class Driver extends Thread  {
 	
 	NXTRegulatedMotor leftMotor = Motor.A;
 	NXTRegulatedMotor rightMotor = Motor.B;
-	//NXTRegulatedMotor armMotor = Motor.C;
+	NXTRegulatedMotor armMotor = Motor.C;
 	
 	private static double WHEEL_BASE = 15.5;
 	private static double WHEEL_RADIUS = 2.16;
@@ -143,13 +143,14 @@ public class Driver extends Thread  {
 			rightMotor.forward();
 		}
 	}
-/*	public void grab(){
+	public void grab(){
+		this.goForward(8, false);
 		armMotor.forward();
 		armMotor.setSpeed(150);
-		armMotor.rotate(-75, true);
+		armMotor.rotate(-100, false);
 		Delay.msDelay(250);
 		armMotor.stop();
-	}*/
+	}
 	public void stop(){
 		speed = leftMotor.getSpeed();
 		leftMotor.setSpeed(0);

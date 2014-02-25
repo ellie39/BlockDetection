@@ -40,8 +40,9 @@ public class Lab5 {
 			
 			//Travel doesn't block anymore, so Immiediate Return occurs
 			driver.travel(xDest, yDest);
-			//allows blocks to be detected
-			while(true){
+			boolean findingBlock = true;
+			//avoidance
+			while(findingBlock && (odo.getY() < 145)){
 				//avoids if object
 				if(blockDetector.seesObject()){
 					driver.stop();
@@ -52,6 +53,7 @@ public class Lab5 {
 						Sound.beep();
 						Delay.msDelay(100);
 						getBlock();
+						findingBlock = false;
 					} else {
 						avoidBlock();
 					}
@@ -60,6 +62,7 @@ public class Lab5 {
 					}
 				}
 			}
+			
 		}
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
@@ -68,12 +71,11 @@ public class Lab5 {
 		driver.stop();
 		Sound.buzz();
 		Delay.msDelay(1000);
-		driver.goBackward(10);
 		driver.turnTo(90);
 		if(blockDetector.seesBlock() || !blockDetector.seesObject()){
-			driver.goForward(25, false);
+			driver.goForward(30, false);
 			driver.turnTo(-90);
-			driver.goForward(5, false);
+			driver.goForward(15, false);
 			driver.turnTo(-30);
 			if(blockDetector.seesObject()){
 				avoidBlock();
@@ -81,6 +83,7 @@ public class Lab5 {
 		}
 	}
 	public static void getBlock(){
-		driver.stop();
+		driver.grab();
+		driver.travel(70 ,190);
 	}
 }
