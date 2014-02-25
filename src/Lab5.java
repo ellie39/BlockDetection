@@ -6,6 +6,7 @@ public class Lab5 {
 	public static double yDest = 150;
 	public static Driver driver;
 	public static BlockDetection blockDetector;
+	public static boolean hasBlock = false;
 	public static void main(String[] args) {
 		// setup the pollers
 		UltrasonicPoller usPoller = new UltrasonicPoller(new UltrasonicSensor(SensorPort.S2));
@@ -35,26 +36,28 @@ public class Lab5 {
 		lcd.start();
 		if(buttonChoice == Button.ID_RIGHT){
 			
-/*			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
-			usLocalizer.doLocalization();*/
+			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
+			usLocalizer.doLocalization();
 			
 			//Travel doesn't block anymore, so Immiediate Return occurs
 			driver.travel(xDest, yDest);
-			boolean findingBlock = true;
 			//avoidance
-			while(findingBlock && (odo.getY() < 145)){
+			while((odo.getY() < 145)){
 				//avoids if object
 				if(blockDetector.seesObject()){
 					driver.stop();
+					//beeps that it sees an object
 					Sound.beep();
 					Delay.msDelay(100);
+					//goes forward to improve accuracy of light sensor
 					driver.goForward(2, false);
+					//beeps and gets block if it sees one
 					if(blockDetector.seesBlock()){
 						Sound.beep();
 						Delay.msDelay(100);
 						getBlock();
-						findingBlock = false;
 					} else {
+						//obstacle avoidance
 						avoidBlock();
 					}
 					if(!blockDetector.seesObject() || blockDetector.seesBlock()){
@@ -62,7 +65,21 @@ public class Lab5 {
 					}
 				}
 			}
-			
+			//searches for block
+			driver.rotate(true);
+			while(!hasBlock){
+				if(usPoller.getDistance() < 30){
+					driver.goForward(usPoller.getDistance() - 5, false);
+					if(blockDetector.seesBlock()){
+						driver.goForward(5);
+						getBlock();
+					} else {
+						driver.travel(Lab5.xDest, Lab5.yDest);
+					}
+				} else {
+					driver.rotate(true);
+				}
+			}
 		}
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
@@ -83,6 +100,7 @@ public class Lab5 {
 		}
 	}
 	public static void getBlock(){
+		hasBlock = true;
 		driver.grab();
 		driver.travel(70 ,190);
 	}
