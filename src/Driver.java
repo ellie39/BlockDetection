@@ -147,7 +147,7 @@ public class Driver extends Thread  {
 		this.goForward(8, false);
 		armMotor.forward();
 		armMotor.setSpeed(150);
-		armMotor.rotate(-100, false);
+		armMotor.rotate(-120, false);
 		Delay.msDelay(250);
 		armMotor.stop();
 	}

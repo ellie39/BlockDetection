@@ -2,7 +2,7 @@ import lejos.nxt.*;
 import lejos.util.Delay;
 
 public class Lab5 {
-	public static double xDest = 30;
+	public static double xDest = 25;
 	public static double yDest = 150;
 	public static Driver driver;
 	public static BlockDetection blockDetector;
@@ -35,7 +35,6 @@ public class Lab5 {
 				&& buttonChoice != Button.ID_RIGHT);
 		lcd.start();
 		if(buttonChoice == Button.ID_RIGHT){
-			
 			USLocalizer usLocalizer = new USLocalizer(odo, driver, usPoller, USLocalizer.LocalizationType.FALLING_EDGE);
 			usLocalizer.doLocalization();
 			
@@ -68,17 +67,20 @@ public class Lab5 {
 			//searches for block
 			driver.rotate(true);
 			while(!hasBlock){
-				if(usPoller.getDistance() < 30){
-					driver.goForward(usPoller.getDistance() - 5, false);
+				if(usPoller.getDistance() < 40){
+					driver.goForward(22, false);
+					driver.stop();
+					Delay.msDelay(500);
 					if(blockDetector.seesBlock()){
-						driver.goForward(5);
 						getBlock();
 					} else {
-						driver.travel(Lab5.xDest, Lab5.yDest);
+						driver.goBackward(22);
+						driver.rotate(true);
 					}
 				} else {
 					driver.rotate(true);
 				}
+				Delay.msDelay(500);
 			}
 		}
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
